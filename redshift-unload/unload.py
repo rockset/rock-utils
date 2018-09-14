@@ -1,6 +1,6 @@
 '''
 Based on https://github.com/openbridge/ob_redshift_unload
-Rockset Document 
+Rockset Document
 '''
 
 import json
@@ -40,8 +40,8 @@ def _read_schema(cursor, schema_name, table_name):
     res = cursor.fetchall()
     return res
 
-def _dump_schema_file(schema_def):
-    file = 'schema.yaml'
+def _dump_schema_file(table_name, schema_def):
+    file = table_name + '.schema.yaml'
     serialized = dict()
     serialized['version'] = 1.0
     serialized['types'] = list()
@@ -56,7 +56,7 @@ def run(config, table_name, file_path, schema_name=None, range_col=None, range_s
         file_path = table_name
     conn = psycopg2.connect(**config['db'])
     res = _read_schema(conn.cursor(), schema_name, table_name)
-    _dump_schema_file(res)
+    _dump_schema_file(table_name, res)
 
     cast_columns = []
     for col in res:
@@ -72,12 +72,12 @@ def run(config, table_name, file_path, schema_name=None, range_col=None, range_s
     if range_col and range_start and range_end:
         where_clause = cursor.mogrify("WHERE {} BETWEEN \\\'{}\\\' AND \\\'{}\\\'".format(range_col, range_start, range_end,))
     query = """
-    UNLOAD (\'SELECT {0} FROM {1}{2} {3}\')  
+    UNLOAD (\'SELECT {0} FROM {1}{2} {3}\')
     TO \'{6}\'
     CREDENTIALS 'aws_access_key_id={4};aws_secret_access_key={5}'
     {7}
-    """.format(cast_columns_str, '{}.'.format(schema_name) if schema_name else '', table_name, 
-               where_clause, config['aws_access_key_id'], 
+    """.format(cast_columns_str, '{}.'.format(schema_name) if schema_name else '', table_name,
+               where_clause, config['aws_access_key_id'],
                config['aws_secret_access_key'], file_path, unload_options)
     print("The following UNLOAD query is being run: \n" + query)
     cursor.execute(query)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', help='Range column')
     parser.add_argument('-r1', help='Range start')
     parser.add_argument('-r2', help='Range end')
-    raw_args = parser.parse_args() 
+    raw_args = parser.parse_args()
     if 's' in vars(raw_args) and raw_args.s:
         with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), raw_args.s), 'r') as f:
             raw_args.s = f.read()
