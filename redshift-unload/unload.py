@@ -40,13 +40,13 @@ def _read_schema(cursor, schema_name, table_name):
     res = cursor.fetchall()
     return res
 
-def _dump_schema_file(schema_def, table_name):
+def _dump_schema_file(schema_def):
     file = 'schema.yaml'
     serialized = dict()
     serialized['version'] = 1.0
-    serialized['fields'] = list()
+    serialized['types'] = list()
     for v, t in schema_def:
-        serialized[table_name].append({v: _get_rockset_type(t)})
+        serialized['types'].append({v: _get_rockset_type(t)})
     with open(file, 'w') as outfile:
         yaml.dump(serialized, outfile, default_flow_style=False)
     print('=== Completed write to {} ==='.format(file))
@@ -56,7 +56,7 @@ def run(config, table_name, file_path, schema_name=None, range_col=None, range_s
         file_path = table_name
     conn = psycopg2.connect(**config['db'])
     res = _read_schema(conn.cursor(), schema_name, table_name)
-    _dump_schema_file(res, table_name)
+    _dump_schema_file(res)
 
     cast_columns = []
     for col in res:
