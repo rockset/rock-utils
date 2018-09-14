@@ -44,7 +44,7 @@ def _dump_schema_file(schema_def, table_name):
     file = 'schema.yaml'
     serialized = dict()
     serialized['version'] = 1.0
-    serialized[table_name] = list()
+    serialized['fields'] = list()
     for v, t in schema_def:
         serialized[table_name].append({v: _get_rockset_type(t)})
     with open(file, 'w') as outfile:
