@@ -33,32 +33,6 @@ pip install -U psycopg2
 ```
 If pip is not installed, use the following instructions: https://pip.pypa.io/en/stable/installing/
 
-# Configure your Redshift cluster and AWS credentials/
-
-Edit the config.json to add credentials to access your RDS cluster.
-Only the fields encapsulated in `<>` need to be modified.
-
-```
-{
-    "db": {
-        "host": "<redshift-cluster>",
-        "port": "<port>",
-        "database": "<database-name>",
-        "user": "<user>",
-        "password": "<password>"
-    },
-    "aws_access_key_id": "<key>",
-    "aws_secret_access_key": "<secret>",
-    "unload_options": [
-    	"ADDQUOTES",
-    	"PARALLEL ON",
-    	"ALLOWOVERWRITE",
-    	"DELIMITER ','",
-        "NULL AS '_rockset_null'"
-    ]
-}
-```
-
 # Run the script
 
 ```
