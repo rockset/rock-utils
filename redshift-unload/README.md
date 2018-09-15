@@ -1,4 +1,11 @@
-# Unload CSVs from Redshift to Rockset.
+# Load a table from AWS Redshift to Rockset
+
+## Overview
+
+This process first dumps the data from your Redshift table to your
+S3 bucket. Then you create a Rockset collection and load data from
+that S3 bucket.
+
 
 ## Edit the configuration file - config.json
 
@@ -51,4 +58,17 @@ optional arguments:
 ## Common usage:
 ```
 python ./unload.py -t <table-name> -f s3://<your-s3-bucket>/
+```
+
+The above command uploads the contents of your RedShift table into the 
+specified S3 bucket. It also creates a local file named <table-name>.schema.yaml
+that contains the metadata about the Redshift table.
+
+Now you can create a Rockset collection to load the data from the 
+S3 bucket.
+```
+rock create collection <collectionname> s3://bucket_path
+             --integration <name f integration>
+             --format=CSV
+             --csv-schema-file=<redshift-table-name>.schema.yaml
 ```
